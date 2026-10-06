@@ -1,0 +1,62 @@
+# Including 1st file information
+from student_writer import Student, FILE_NAME
+import json
+
+# FEATURE: Handle Invalid Input using Exceptions
+class FileNotFoundErrorCustom(Exception):
+    pass
+
+class EmptyFileError(Exception):
+    pass
+
+class InvalidChoiceError(Exception):
+    pass
+
+# FEATURE: Read Student Data
+def read_student_data():
+    try:
+        # Try to open file
+        with open(FILE_NAME, 'r') as f:
+            data = json.load(f)
+
+        if not data:
+            raise EmptyFileError("File is empty! No students added yet.")
+
+        print("\n--- Student Records ---")
+        for item in data:
+            # Converting dict back to Student object from 1st file
+            s = Student(item['id'], item['name'], item['email'], item['course'])
+            print(f"ID: {s.sid} | Name: {s.name} | Email: {s.email} | Course: {s.course}")
+
+    except FileNotFoundError:
+        raise FileNotFoundErrorCustom(f"Error: File '{FILE_NAME}' not found! Please add a student first using File 1.")
+    except json.JSONDecodeError:
+        raise EmptyFileError("Error: File is corrupted or empty!")
+    except EmptyFileError as e:
+        print(e)
+    except FileNotFoundErrorCustom as e:
+        print(e)
+    except Exception as e:
+        print(f"Unexpected Error Occurred: {e}")
+
+def main():
+    try:
+        print("===== STUDENT RECORD MANAGER - READER =====")
+        print("1. Read All Students")
+        print("2. Exit")
+        choice = input("Enter choice: ").strip()
+
+        if choice == '1':
+            read_student_data()
+        elif choice == '2':
+            print("Exiting...")
+        else:
+            raise InvalidChoiceError("Please enter only 1 or 2!")
+
+    except InvalidChoiceError as e:
+        print(f"Invalid Input: {e}")
+    except Exception as e:
+        print(f"Error: {e}")
+
+if __name__ == "__main__":
+    main()
